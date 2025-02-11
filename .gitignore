@@ -1,0 +1,6 @@
+./file-cleaner
+./file-cleaner.exe
+
+/dist
+
+/tmp

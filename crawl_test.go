@@ -62,28 +62,28 @@ func createNullFile(filePath string, size uint64) error {
 func TestCrawl(t *testing.T) {
 	relPathsWhenFullPattern := []string{
 		"1",
-		"1/1",
-		"1/1/1", "1/1/2", "1/1/3",
-		"1/2",
-		"1/2/1", "1/2/2", "1/2/3",
+		filepath.Join("1", "1"),
+		filepath.Join("1", "1", "1"), filepath.Join("1", "1", "2"), filepath.Join("1", "1", "3"),
+		filepath.Join("1", "2"),
+		filepath.Join("1", "2", "1"), filepath.Join("1", "2", "2"), filepath.Join("1", "2", "3"),
 		"2",
-		"2/1",
-		"2/1/1", "2/1/2", "2/1/3",
-		"2/2",
-		"2/2/1", "2/2/2", "2/2/3",
+		filepath.Join("2", "1"),
+		filepath.Join("2", "1", "1"), filepath.Join("2", "1", "2"), filepath.Join("2", "1", "3"),
+		filepath.Join("2", "2"),
+		filepath.Join("2", "2", "1"), filepath.Join("2", "2", "2"), filepath.Join("2", "2", "3"),
 	}
 	filesWhenFullPattern := uint64(12)
 
 	pattern := "*/2/**"
 	relPathsWhenPatterned := []string{
-		"1/2",
-		"1/2/1",
-		"1/2/2",
-		"1/2/3",
-		"2/2",
-		"2/2/1",
-		"2/2/2",
-		"2/2/3",
+		filepath.Join("1", "2"),
+		filepath.Join("1", "2", "1"),
+		filepath.Join("1", "2", "2"),
+		filepath.Join("1", "2", "3"),
+		filepath.Join("2", "2"),
+		filepath.Join("2", "2", "1"),
+		filepath.Join("2", "2", "2"),
+		filepath.Join("2", "2", "3"),
 	}
 	filesWhenPatterned := uint64(6)
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"sync"
 
@@ -39,7 +38,7 @@ func matchPattern(pattern, rootPath, fullPath string) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("failed to get relative path from %s on %s: %v", fullPath, rootPath, err)
 	}
-	matched, err := doublestar.Match(pattern, relPath)
+	matched, err := doublestar.Match(pattern, filepath.ToSlash(relPath))
 	if err != nil {
 		return false, fmt.Errorf("failed to match pattern %s on %s: %v", pattern, relPath, err)
 	}
@@ -48,7 +47,7 @@ func matchPattern(pattern, rootPath, fullPath string) (bool, error) {
 
 // エントリを処理する共通関数
 func processEntry(rootPath, pattern, dirPath string, entry os.DirEntry, entryHandler EntryHandler, errorHandler ErrorHandler) (string, os.FileInfo, bool) {
-	fullPath := path.Join(dirPath, entry.Name())
+	fullPath := filepath.Join(dirPath, entry.Name())
 
 	fileInfo, err := entry.Info()
 	if err != nil {

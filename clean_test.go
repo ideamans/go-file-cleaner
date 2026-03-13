@@ -66,6 +66,9 @@ func TestThresholdShouldNotExceedCurrentTime(t *testing.T) {
 func TestClean(t *testing.T) {
 	totalEntries := uint64(14)
 
+	// ヘルパー: スラッシュ区切りのパスをOS区切りに変換
+	p := filepath.FromSlash
+
 	cases := []struct {
 		name         string
 		fileTimeType FileTimeType
@@ -85,8 +88,8 @@ func TestClean(t *testing.T) {
 			targetSize:   4096*totalEntries - 4000,
 			timeUnit:     time.Hour,
 			concurrently: 1,
-			examples:     []string{"2/2/1"},
-			entries:      []string{".", "1", "1/1", "1/1/1", "1/1/2", "1/2", "1/2/1", "1/2/2", "2", "2/1", "2/1/1", "2/1/2", "2/2", "2/2/2"},
+			examples:     []string{p("2/2/1")},
+			entries:      []string{".", "1", p("1/1"), p("1/1/1"), p("1/1/2"), p("1/2"), p("1/2/1"), p("1/2/2"), "2", p("2/1"), p("2/1/1"), p("2/1/2"), p("2/2"), p("2/2/2")},
 		},
 		{
 			name:         "atime-remove1-concurrently1",
@@ -96,8 +99,8 @@ func TestClean(t *testing.T) {
 			targetSize:   4096*totalEntries - 4000,
 			timeUnit:     time.Hour,
 			concurrently: 1,
-			examples:     []string{"1/1/1"},
-			entries:      []string{".", "1", "1/1", "1/1/2", "1/2", "1/2/1", "1/2/2", "2", "2/1", "2/1/1", "2/1/2", "2/2", "2/2/1", "2/2/2"},
+			examples:     []string{p("1/1/1")},
+			entries:      []string{".", "1", p("1/1"), p("1/1/2"), p("1/2"), p("1/2/1"), p("1/2/2"), "2", p("2/1"), p("2/1/1"), p("2/1/2"), p("2/2"), p("2/2/1"), p("2/2/2")},
 		},
 		{
 			name:         "mtime-remove2-concurrently1",
@@ -107,8 +110,8 @@ func TestClean(t *testing.T) {
 			targetSize:   4096*totalEntries - 5000,
 			timeUnit:     time.Hour,
 			concurrently: 1,
-			examples:     []string{"2/2/1", "2/2/2"},
-			entries:      []string{".", "1", "1/1", "1/1/1", "1/1/2", "1/2", "1/2/1", "1/2/2", "2", "2/1", "2/1/1", "2/1/2"},
+			examples:     []string{p("2/2/1"), p("2/2/2")},
+			entries:      []string{".", "1", p("1/1"), p("1/1/1"), p("1/1/2"), p("1/2"), p("1/2/1"), p("1/2/2"), "2", p("2/1"), p("2/1/1"), p("2/1/2")},
 		},
 		{
 			name:         "atime-remove2-concurrently1",
@@ -118,8 +121,8 @@ func TestClean(t *testing.T) {
 			targetSize:   4096*totalEntries - 5000,
 			timeUnit:     time.Hour,
 			concurrently: 1,
-			examples:     []string{"1/1/1", "1/1/2"},
-			entries:      []string{".", "1", "1/2", "1/2/1", "1/2/2", "2", "2/1", "2/1/1", "2/1/2", "2/2", "2/2/1", "2/2/2"},
+			examples:     []string{p("1/1/1"), p("1/1/2")},
+			entries:      []string{".", "1", p("1/2"), p("1/2/1"), p("1/2/2"), "2", p("2/1"), p("2/1/1"), p("2/1/2"), p("2/2"), p("2/2/1"), p("2/2/2")},
 		},
 		{
 			name:         "mtime-remove1-concurrently2",
@@ -129,8 +132,8 @@ func TestClean(t *testing.T) {
 			targetSize:   4096*totalEntries - 4000,
 			timeUnit:     time.Hour,
 			concurrently: 1,
-			examples:     []string{"2/2/1"},
-			entries:      []string{".", "1", "1/1", "1/1/1", "1/1/2", "1/2", "1/2/1", "1/2/2", "2", "2/1", "2/1/1", "2/1/2", "2/2", "2/2/2"},
+			examples:     []string{p("2/2/1")},
+			entries:      []string{".", "1", p("1/1"), p("1/1/1"), p("1/1/2"), p("1/2"), p("1/2/1"), p("1/2/2"), "2", p("2/1"), p("2/1/1"), p("2/1/2"), p("2/2"), p("2/2/2")},
 		},
 		{
 			name:         "atime-remove1-concurrently2",
@@ -140,8 +143,8 @@ func TestClean(t *testing.T) {
 			targetSize:   4096*totalEntries - 4000,
 			timeUnit:     time.Hour,
 			concurrently: 1,
-			examples:     []string{"1/1/1"},
-			entries:      []string{".", "1", "1/1", "1/1/2", "1/2", "1/2/1", "1/2/2", "2", "2/1", "2/1/1", "2/1/2", "2/2", "2/2/1", "2/2/2"},
+			examples:     []string{p("1/1/1")},
+			entries:      []string{".", "1", p("1/1"), p("1/1/2"), p("1/2"), p("1/2/1"), p("1/2/2"), "2", p("2/1"), p("2/1/1"), p("2/1/2"), p("2/2"), p("2/2/1"), p("2/2/2")},
 		},
 	}
 

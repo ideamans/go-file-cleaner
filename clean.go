@@ -85,10 +85,10 @@ func fileTimeUnix(fileInfo os.FileInfo, fileTimeType FileTimeType) uint64 {
 	return uint64(fileInfo.ModTime().Unix())
 }
 
-// ファイル時刻から集計時間単位秒への切り上げ
+// ファイル時刻から集計時間単位秒への切り捨て（床丸め）
 func fileTimeToTimeBinSec(fileInfo os.FileInfo, fileTimeType FileTimeType, timeBinSec uint64) uint64 {
 	t := fileTimeUnix(fileInfo, fileTimeType)
-	return ((t + timeBinSec - 1) / timeBinSec) * timeBinSec
+	return (t / timeBinSec) * timeBinSec
 }
 
 // 第1フェーズ: 集計の実装
@@ -275,9 +275,9 @@ func removeFiles(input *removingInput) (*removingOutput, error) {
 			return
 		}
 
-		fileTimeSec := fileTimeUnix(fileInfo, input.fileTimeType)
+		fileTimeBinSec := fileTimeToTimeBinSec(fileInfo, input.fileTimeType, input.timeBinSec)
 		blockSize := fileSizeToBlockSize(fileInfo, input.blockSize)
-		if fileTimeSec <= input.removeBeforeSec {
+		if fileTimeBinSec <= input.removeBeforeSec {
 			// 削除対象時刻以前のファイルを削除する
 			if input.dryRun {
 				// ドライランの場合はメッセージのみ

@@ -1,6 +1,7 @@
 package filecleaner
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -9,6 +10,58 @@ import (
 
 	"github.com/go-test/deep"
 )
+
+// 閾値が未来の時刻にならないことを検証するテスト
+// https://github.com/ideamans/go-file-cleaner/issues/X
+// 天井丸め(ceiling)だと現在時刻20:05のファイルがビン21:00に入り、
+// 閾値が未来になって全ファイルが削除される問題があった
+func TestThresholdShouldNotExceedCurrentTime(t *testing.T) {
+	temp, _ := os.MkdirTemp("", "threshold_test")
+	defer os.RemoveAll(temp)
+
+	// 10個のファイルを作成（各2048バイト、ブロックサイズ4096）
+	// 半分は1時間前、半分は現在時刻のタイムスタンプ
+	now := time.Now()
+	oneHourAgo := now.Add(-1 * time.Hour)
+
+	for i := 0; i < 10; i++ {
+		filePath := filepath.Join(temp, fmt.Sprintf("file%d.dat", i))
+		f, err := os.Create(filePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		f.Write(make([]byte, 2048))
+		f.Close()
+
+		if i < 5 {
+			os.Chtimes(filePath, oneHourAgo, oneHourAgo)
+		}
+		// i >= 5 のファイルは現在時刻のまま
+	}
+
+	// ターゲットサイズを非常に小さく設定し、ほぼ全ファイルの削除を要求
+	input := &CleaningInput{
+		RootPath:     temp,
+		BlockSize:    4096,
+		TargetSize:   4096, // 1ブロック分だけ残す
+		FileTimeType: ModTime,
+		TimeBin:      time.Hour,
+		Pattern:      "",
+		Examples:     10,
+		Concurrency:  1,
+		DryRun:       true, // 実際には削除しない
+	}
+
+	result, err := Clean(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// 閾値が未来の時刻でないことを確認
+	if !result.RemoveBefore.IsZero() && result.RemoveBefore.After(now) {
+		t.Errorf("threshold time %s is in the future (now: %s)", result.RemoveBefore.Format(time.RFC3339), now.Format(time.RFC3339))
+	}
+}
 
 func TestClean(t *testing.T) {
 	totalEntries := uint64(14)
